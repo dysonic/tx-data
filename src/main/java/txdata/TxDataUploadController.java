@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
 import com.webcohesion.ofx4j.io.OFXParseException;
-import com.webcohesion.ofx4j.io.DefaultHandler;
 import com.webcohesion.ofx4j.io.OFXReader;
 import com.webcohesion.ofx4j.io.nanoxml.NanoXMLOFXReader;
 
@@ -47,7 +46,8 @@ public class TxDataUploadController {
 //		String content = getFileContent(file);
 //		logger.info("content: " + content);
 		parseOfx(file);
-		final TxData txData = new TxData(1, "");
+		final TxData txData = new TxData();
+		txData.setId(1);
 		return txData;
 	}
 	
@@ -69,10 +69,15 @@ public class TxDataUploadController {
 		}
 	}
 	
-	private void parseOfx(final MultipartFile file) throws IOException, OFXParseException {
+	private TxData parseOfx(final MultipartFile file) throws IOException, OFXParseException {
 		OFXReader ofxReader = new NanoXMLOFXReader();
-		ofxReader.setContentHandler(new DefaultHandler());
+		TxDataOFXHandler txDataOFXHandler = new TxDataOFXHandler();
+		final TxData txData = new TxData();
+		txData.setId(1);
+		txDataOFXHandler.setTxData(txData);
+		ofxReader.setContentHandler(new TxDataOFXHandler());
 		ofxReader.parse(file.getInputStream());
+		return txData;
 	}
 	
 	

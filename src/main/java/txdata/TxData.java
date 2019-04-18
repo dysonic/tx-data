@@ -2,19 +2,25 @@ package txdata;
 
 public class TxData {
 
-    private final long id;
-    private final String content;
+    private long id;
 
-    public TxData(long id, String content) {
-        this.id = id;
-        this.content = content;
-    }
+	private Account account;
+
 
     public long getId() {
-        return id;
+    	return id;
     }
 
-    public String getContent() {
-        return content;
+    public void setId(long id) {
+    	this.id = id;
     }
+
+    public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+
 }

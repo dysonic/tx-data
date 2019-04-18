@@ -13,7 +13,9 @@ public class TxDataController {
 
     @RequestMapping("/api/tx-data")
     public TxData greeting(@RequestParam(value="name", defaultValue="World") String name) {
-        return new TxData(counter.incrementAndGet(),
-                            String.format(template, name));
+    	TxData txData = new TxData();
+    	txData.setId(counter.incrementAndGet());
+    	// String.format(template, name)
+        return txData;
     }
 }
