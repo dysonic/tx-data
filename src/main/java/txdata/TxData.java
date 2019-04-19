@@ -50,5 +50,9 @@ public class TxData {
 	public void addTransaction(Transaction transaction) {
 		transactions.add(transaction);
 	}
+	
+	public ArrayList<Transaction> getTransactions() {
+		return transactions;
+	}
 
 }

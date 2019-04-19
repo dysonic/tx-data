@@ -36,25 +36,15 @@ public class TxDataUploadController {
 		return "acceptable MIME type:" + MediaType.APPLICATION_JSON_VALUE;
 	}
 
-	@PostMapping(value = "/api/tx-data/upload")
+	@PostMapping(value = "/api/tx-data/upload", produces = "application/json")
 	public TxData handleFileUpload(@RequestParam("file") final MultipartFile file) throws Exception {
 		String filename = file.getOriginalFilename();
 		long size = file.getSize();
 		logger.info("uploadFile: " + filename + " (" + size + " bytes)");
 		throwExceptionIfEmpty(file);
 //		throwExceptionIfNotOfx(file);
-//		String content = getFileContent(file);
-//		logger.info("content: " + content);
-		parseOfx(file);
-		final TxData txData = new TxData();
-		txData.setId(1);
+		TxData txData = parseOfx(file);
 		return txData;
-	}
-	
-	private String getFileContent(final MultipartFile file) throws Exception {
-		StringWriter writer = new StringWriter();
-		IOUtils.copy(file.getInputStream(), writer, "UTF-8");
-		return writer.toString();
 	}
 	
 	private void throwExceptionIfEmpty(final MultipartFile file) throws Exception {
