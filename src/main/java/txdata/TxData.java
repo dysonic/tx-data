@@ -6,6 +6,8 @@ import java.util.ArrayList;
 public class TxData {
 
     private long id;
+    private String filename;
+    private long size;
 	private Account account;
 	private LocalDate startDate;
 	private LocalDate endDate;
@@ -53,6 +55,22 @@ public class TxData {
 	
 	public ArrayList<Transaction> getTransactions() {
 		return transactions;
+	}
+
+	public String getFilename() {
+		return filename;
+	}
+
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
 	}
 
 }

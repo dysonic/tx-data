@@ -37,6 +37,7 @@ public class TxDataUploadController {
 	}
 
 	@PostMapping(value = "/api/tx-data/upload", produces = "application/json")
+	@ResponseBody
 	public TxData handleFileUpload(@RequestParam("file") final MultipartFile file) throws Exception {
 		String filename = file.getOriginalFilename();
 		long size = file.getSize();
@@ -61,12 +62,14 @@ public class TxDataUploadController {
 	
 	private TxData parseOfx(final MultipartFile file) throws IOException, OFXParseException {
 		OFXReader ofxReader = new NanoXMLOFXReader();
-		TxDataOFXHandler txDataOFXHandler = new TxDataOFXHandler();
 		final TxData txData = new TxData();
+		txData.setFilename(file.getOriginalFilename());
+		txData.setSize(file.getSize());
+		TxDataOFXHandler txDataOFXHandler = new TxDataOFXHandler(txData);
 		txData.setId(1);
-		txDataOFXHandler.setTxData(txData);
-		ofxReader.setContentHandler(new TxDataOFXHandler());
+		ofxReader.setContentHandler(txDataOFXHandler);
 		ofxReader.parse(file.getInputStream());
+		logger.info("# of txs: " + txData.getTransactions().size());
 		return txData;
 	}
 	

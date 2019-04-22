@@ -56,8 +56,8 @@ public class TxDataOFXHandler implements OFXHandler {
 		}
 	}
 
-	public TxDataOFXHandler() {
-		txData = new TxData();
+	public TxDataOFXHandler(TxData txData) {
+		this.txData = txData;
 		builders = new Stack<ObjectBuilder>();
 		noopBuilder = new NoopBuilder();
 	}
@@ -66,29 +66,25 @@ public class TxDataOFXHandler implements OFXHandler {
 		return txData;
 	}
 	
-	public void setTxData(TxData txData) {
-		this.txData = txData;
-	}
-	
 	@Override
 	public void onHeader(String name, String value) throws OFXSyntaxException {
-		logger.info("onHeader: name: " + name + ", value: " + value);
+//		logger.info("onHeader: name: " + name + ", value: " + value);
 	}
 
 	@Override
 	public void onElement(String name, String value) throws OFXSyntaxException {
-		logger.info("onElement: name: " + name + ", value: " + value);
+//		logger.info("onElement: name: " + name + ", value: " + value);
 		getBuilder().add(name, value);
 		
 	}
 
 	private void pushBuilder(ObjectBuilder objectBuilder) {
 		builders.push(objectBuilder);
-		logger.info("pushBuilder: #" + builders.size() + " after");
+//		logger.info("pushBuilder: #" + builders.size() + " after");
 	}
 	
 	private ObjectBuilder popBuilder() {
-		logger.info("popBuilder: #" + builders.size() + " before");
+//		logger.info("popBuilder: #" + builders.size() + " before");
 		return builders.pop();
 	}
 	
@@ -98,7 +94,7 @@ public class TxDataOFXHandler implements OFXHandler {
 
 	@Override
 	public void startAggregate(String aggregateName) throws OFXSyntaxException {
-		logger.info("startAggregate: " + aggregateName);
+//		logger.info("startAggregate: " + aggregateName);
 		switch(aggregateName) {
 			case BANK_ACCOUNT_FROM: pushBuilder(new AccountBuilder()); break;
 			case BANK_TRANSACTION_LIST: pushBuilder(new TxDataBuilder()); break;
@@ -110,7 +106,7 @@ public class TxDataOFXHandler implements OFXHandler {
 
 	@Override
 	public void endAggregate(String aggregateName) throws OFXSyntaxException {
-		logger.info("endAggregate: " + aggregateName);
+//		logger.info("endAggregate: " + aggregateName);
 		switch(aggregateName) {
 			case BANK_ACCOUNT_FROM: txData.setAccount((Account) popBuilder().build()); break;
 			case STATEMENT_TRANSACTION: txData.addTransaction((Transaction) popBuilder().build()); break;
