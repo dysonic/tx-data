@@ -1,22 +1,18 @@
 package txdata;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -25,11 +21,14 @@ import com.webcohesion.ofx4j.io.OFXParseException;
 import com.webcohesion.ofx4j.io.OFXReader;
 import com.webcohesion.ofx4j.io.nanoxml.NanoXMLOFXReader;
 
+import txdata.services.StorageService;
+
 @Controller
 public class TxDataUploadController {
 
 	Logger logger = LoggerFactory.getLogger(LoggingController.class);
-
+	StorageService storageService = new StorageService();
+	
 	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
 	public String handleHttpMediaTypeNotAcceptableException(HttpServletRequest req, Exception ex) {
 		logger.error("handleHttpMediaTypeNotAcceptableException");
@@ -45,6 +44,7 @@ public class TxDataUploadController {
 		throwExceptionIfEmpty(file);
 //		throwExceptionIfNotOfx(file);
 		TxData txData = parseOfx(file);
+		storageService.save(txData);
 		return txData;
 	}
 	
@@ -64,9 +64,9 @@ public class TxDataUploadController {
 		OFXReader ofxReader = new NanoXMLOFXReader();
 		final TxData txData = new TxData();
 		txData.setFilename(file.getOriginalFilename());
-		txData.setSize(file.getSize());
+		txData.setSize(Math.toIntExact(file.getSize()));
+		txData.setUploadTime(LocalDateTime.now());
 		TxDataOFXHandler txDataOFXHandler = new TxDataOFXHandler(txData);
-		txData.setId(1);
 		ofxReader.setContentHandler(txDataOFXHandler);
 		ofxReader.parse(file.getInputStream());
 		logger.info("# of txs: " + txData.getTransactions().size());

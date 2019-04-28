@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="txdata.TxData" table="tx_data" catalog="tx_data">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <property name="filename" type="string">
+            <column name="filename" length="255" />
+        </property>
+        <property name="size" type="java.lang.Integer">
+            <column name="size" />
+        </property>
+        <property name="startDate" type="java.time.LocalDate">
+            <column name="start_date" />
+        </property>
+        <property name="endDate" type="java.time.LocalDate">
+            <column name="end_date" />
+        </property>
+        <property name="uploadTime" type="LocalDateTime">
+            <column name="upload_time" />
+        </property>
+    </class>
+</hibernate-mapping>

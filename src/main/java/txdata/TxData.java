@@ -1,17 +1,21 @@
 package txdata;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class TxData {
+public class TxData implements java.io.Serializable {
 
-    private long id;
+	private static final long serialVersionUID = 1L;
+
+    private int id;
     private String filename;
-    private long size;
+    private int size;
 	private Account account;
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private ArrayList<Transaction> transactions;
+	private LocalDateTime uploadTime;
 
 	public TxData() {
 		transactions = new ArrayList<Transaction>();
@@ -33,11 +37,11 @@ public class TxData {
 		this.endDate = endDate;
 	}
 
-    public long getId() {
+    public int getId() {
     	return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
     	this.id = id;
     }
 
@@ -65,12 +69,20 @@ public class TxData {
 		this.filename = filename;
 	}
 
-	public long getSize() {
+	public int getSize() {
 		return size;
 	}
 
-	public void setSize(long size) {
+	public void setSize(int size) {
 		this.size = size;
+	}
+
+	public LocalDateTime getUploadTime() {
+		return uploadTime;
+	}
+
+	public void setUploadTime(LocalDateTime uploadTime) {
+		this.uploadTime = uploadTime;
 	}
 
 }
