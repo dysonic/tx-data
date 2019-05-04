@@ -20,7 +20,7 @@
         <property name="endDate" type="java.time.LocalDate">
             <column name="end_date" />
         </property>
-        <property name="uploadTime" type="LocalDateTime">
+        <property name="uploadTime" type="java.time.LocalDateTime">
             <column name="upload_time" />
         </property>
     </class>

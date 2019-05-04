@@ -7,20 +7,29 @@ public class AccountBuilder implements ObjectBuilder {
 	private static final String ACCOUNT_ID =  "ACCTID";
 	private static final String ACCOUNT_TYPE = "ACCTTYPE";
 	
-	Account account;
-	
-	AccountBuilder() {
-		account = new Account();
-	}
+	Account account = new Account();
 
 	@Override
 	public void add(String tagName, String value) {
 		switch(tagName) {
 			case BANK: account.setBank(value); break;
 			case BRANCH: account.setBranch(value); break;
-			case ACCOUNT_ID: account.setAccountNumber(value); break;
+			case ACCOUNT_ID: setAccountNumberAndSuffix(account, value); break;
 			case ACCOUNT_TYPE: account.setType(value); break;
 		}
+	}
+
+	private void setAccountNumberAndSuffix(Account account, String accountId) {
+		String [] arrOfAccountId = accountId.split("-");
+		account.setAccountNumber(arrOfAccountId[0]);
+		account.setSuffix(threeDigitSuffix(arrOfAccountId[1]));
+	}
+	
+	private String threeDigitSuffix(String suffix) {
+		if (suffix.length() == 2) {
+			return "0" + suffix;
+		}
+		return suffix;
 	}
 
 	@Override

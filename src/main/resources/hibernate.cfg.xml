@@ -13,5 +13,6 @@
         <property name="show_sql">true</property>
         <property name="format_sql">true</property>
         <mapping resource="txdata/TxData.hbm.xml"></mapping>
+        <mapping resource="txdata/Account.hbm.xml"></mapping>
     </session-factory>
 </hibernate-configuration>
