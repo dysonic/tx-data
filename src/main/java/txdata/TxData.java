@@ -2,6 +2,7 @@ package txdata;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.ArrayList;
 
 public class TxData implements java.io.Serializable {
@@ -57,7 +58,7 @@ public class TxData implements java.io.Serializable {
 		transactions.add(transaction);
 	}
 	
-	public ArrayList<Transaction> getTransactions() {
+	public List<Transaction> getTransactions() {
 		return transactions;
 	}
 

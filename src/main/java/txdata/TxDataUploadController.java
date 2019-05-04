@@ -27,7 +27,6 @@ import txdata.services.StorageService;
 public class TxDataUploadController {
 
 	Logger logger = LoggerFactory.getLogger(LoggingController.class);
-	StorageService storageService = new StorageService();
 	
 	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
 	public String handleHttpMediaTypeNotAcceptableException(HttpServletRequest req, Exception ex) {
@@ -44,7 +43,7 @@ public class TxDataUploadController {
 		throwExceptionIfEmpty(file);
 //		throwExceptionIfNotOfx(file);
 		TxData txData = parseOfx(file);
-		storageService.save(txData);
+		new StorageService().save(txData);
 		return txData;
 	}
 	

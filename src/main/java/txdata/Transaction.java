@@ -2,13 +2,31 @@ package txdata;
 
 import java.time.LocalDate;
 
-public class Transaction {
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class Transaction implements java.io.Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private int id;
 	private TransactionType type;
 	private LocalDate date;
 	private float amount;
 	private String name;
 	private String details;
+	private TxData txData;
+	private int txSequence;
+	private Account account;
+
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public TransactionType getType() {
 		return type;
@@ -48,6 +66,40 @@ public class Transaction {
 
 	public void setDetails(String details) {
 		this.details = details;
+	}
+
+	@JsonIgnore
+	public TxData getTxData() {
+		return txData;
+	}
+
+    public int getTxDataId() {
+        return txData.getId();
+    }
+    
+	public void setTxData(TxData txData) {
+		this.txData = txData;
+	}
+
+	public int getTxSequence() {
+		return txSequence;
+	}
+
+	public void setTxSequence(int sequence) {
+		this.txSequence = sequence;
+	}
+
+	@JsonIgnore
+	public Account getAccount() {
+		return account;
+	}
+
+    public int getAccountId() {
+        return account.getId();
+    }
+    
+	public void setAccount(Account account) {
+		this.account = account;
 	}
 	
 	

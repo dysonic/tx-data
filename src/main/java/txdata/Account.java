@@ -1,9 +1,11 @@
 package txdata;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Account implements java.io.Serializable {
 
-	private static final String EMPTY_ACCOUNT_NUMBER = "00-0000-0000000-000";
 	private static final long serialVersionUID = 1L;
+	private static final String EMPTY_ACCOUNT_NUMBER = "00-0000-0000000-000";
 
 	private int id;
 	private String bank = "00";
@@ -55,6 +57,7 @@ public class Account implements java.io.Serializable {
 	public void setAlias(String alias) {
 		this.alias = alias;
 	}
+	@JsonProperty("formatted")
 	public String getFormattedAccountNumber() {
 		String[] parts = new String[] { bank, branch, accountNumber, suffix };
 		String accountNumber = String.join("-", parts);

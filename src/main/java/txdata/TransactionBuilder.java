@@ -3,8 +3,13 @@ package txdata;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class TransactionBuilder implements ObjectBuilder {
 
+	Logger logger = LoggerFactory.getLogger(LoggingController.class);
+	
 	private static final String TYPE =  "TRNTYPE";
 	private static final String DATE_POSTED =  "DTPOSTED";
 	private static final String AMOUNT =  "TRNAMT";
@@ -14,8 +19,9 @@ public class TransactionBuilder implements ObjectBuilder {
 	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 	private Transaction transaction;
 	
-	TransactionBuilder() {
+	TransactionBuilder(int sequence) {
 		transaction = new Transaction();
+		transaction.setTxSequence(sequence);
 	}
 	
 	private void setTransactionTypeFromValue(String value) {

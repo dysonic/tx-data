@@ -2,6 +2,7 @@ package txdata;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Stack;
 
 import org.slf4j.Logger;
@@ -16,10 +17,12 @@ public class TxDataOFXHandler implements OFXHandler {
 	private static final String BANK_TRANSACTION_LIST = "BANKTRANLIST";
 	private static final String STATEMENT_TRANSACTION = "STMTTRN";
 	
-	Logger logger = LoggerFactory.getLogger(LoggingController.class);
-	TxData txData;
-	Stack<ObjectBuilder> builders;
-	ObjectBuilder noopBuilder;
+	private Logger logger = LoggerFactory.getLogger(LoggingController.class);
+	private TxData txData;
+	private Stack<ObjectBuilder> builders;
+	private ObjectBuilder noopBuilder;
+	private AtomicInteger counter;
+	
 	
 
 	class NoopBuilder implements ObjectBuilder {
@@ -41,7 +44,6 @@ public class TxDataOFXHandler implements OFXHandler {
 		private static final String DATE_END =  "DTEND";
 		
 		private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-		
 		@Override
 		public void add(String tagName, String value) {
 			switch(tagName) {
@@ -60,6 +62,7 @@ public class TxDataOFXHandler implements OFXHandler {
 		this.txData = txData;
 		builders = new Stack<ObjectBuilder>();
 		noopBuilder = new NoopBuilder();
+		counter = new AtomicInteger();
 	}
 
 	public TxData getTxData() {
@@ -68,23 +71,19 @@ public class TxDataOFXHandler implements OFXHandler {
 	
 	@Override
 	public void onHeader(String name, String value) throws OFXSyntaxException {
-//		logger.info("onHeader: name: " + name + ", value: " + value);
 	}
 
 	@Override
 	public void onElement(String name, String value) throws OFXSyntaxException {
-//		logger.info("onElement: name: " + name + ", value: " + value);
 		getBuilder().add(name, value);
 		
 	}
 
 	private void pushBuilder(ObjectBuilder objectBuilder) {
 		builders.push(objectBuilder);
-//		logger.info("pushBuilder: #" + builders.size() + " after");
 	}
 	
 	private ObjectBuilder popBuilder() {
-//		logger.info("popBuilder: #" + builders.size() + " before");
 		return builders.pop();
 	}
 	
@@ -94,11 +93,10 @@ public class TxDataOFXHandler implements OFXHandler {
 
 	@Override
 	public void startAggregate(String aggregateName) throws OFXSyntaxException {
-//		logger.info("startAggregate: " + aggregateName);
 		switch(aggregateName) {
 			case BANK_ACCOUNT_FROM: pushBuilder(new AccountBuilder()); break;
 			case BANK_TRANSACTION_LIST: pushBuilder(new TxDataBuilder()); break;
-			case STATEMENT_TRANSACTION: pushBuilder(new TransactionBuilder()); break;
+			case STATEMENT_TRANSACTION: pushBuilder(new TransactionBuilder(counter.incrementAndGet())); break;
 			default: pushBuilder(noopBuilder);
 		}
 		
@@ -106,7 +104,6 @@ public class TxDataOFXHandler implements OFXHandler {
 
 	@Override
 	public void endAggregate(String aggregateName) throws OFXSyntaxException {
-//		logger.info("endAggregate: " + aggregateName);
 		switch(aggregateName) {
 			case BANK_ACCOUNT_FROM: txData.setAccount((Account) popBuilder().build()); break;
 			case STATEMENT_TRANSACTION: txData.addTransaction((Transaction) popBuilder().build()); break;

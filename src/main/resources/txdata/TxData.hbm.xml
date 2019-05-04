@@ -23,5 +23,8 @@
         <property name="uploadTime" type="java.time.LocalDateTime">
             <column name="upload_time" />
         </property>
+        <many-to-one name="account" class="txdata.Account" fetch="select">
+            <column name="account_id" not-null="true" />
+        </many-to-one>        
     </class>
 </hibernate-mapping>
