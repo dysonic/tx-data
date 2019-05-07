@@ -15,6 +15,11 @@ public class Account implements java.io.Serializable {
 	private String type = "";
 	private String alias = "";
 
+	public Account() {
+	}
+	public Account(String formattedAccountNumber) {
+		parse(formattedAccountNumber);
+	}
 	public int getId() {
 		return id;
 	}
@@ -63,6 +68,13 @@ public class Account implements java.io.Serializable {
 		String accountNumber = String.join("-", parts);
 		return accountNumber;
 	}
+	public void parse(String formattedAccountNumber) {
+		String[] parts = formattedAccountNumber.split("-");
+		setBank(parts[0]);
+		setBranch(parts[1]);
+		setAccountNumber(parts[2]);
+		setSuffix(parts[3]);
+	}
 	public boolean hasEmptyAccountNumber() {
 		return getFormattedAccountNumber().equals(EMPTY_ACCOUNT_NUMBER);
 	}
@@ -83,9 +95,11 @@ public class Account implements java.io.Serializable {
 	    return toString().equals(account.toString());
 	}
 	public int hashCode() {
-		if (hasEmptyAccountNumber()) {
-			return super.hashCode();
-		}
-		return AccountHashCodeFactory.getInstance().getHashCode(this);
+		int result = 17;
+		result = 31 * result + bank.hashCode();
+		result = 31 * result + branch.hashCode();
+		result = 31 * result + accountNumber.hashCode();
+		result = 31 * result + suffix.hashCode();
+		return result;
 	}	
 }

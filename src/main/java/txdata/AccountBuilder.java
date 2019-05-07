@@ -20,9 +20,9 @@ public class AccountBuilder implements ObjectBuilder {
 	}
 
 	private void setAccountNumberAndSuffix(Account account, String accountId) {
-		String [] arrOfAccountId = accountId.split("-");
-		account.setAccountNumber(arrOfAccountId[0]);
-		account.setSuffix(threeDigitSuffix(arrOfAccountId[1]));
+		String [] parts = accountId.split("-");
+		account.setAccountNumber(parts[0]);
+		account.setSuffix(threeDigitSuffix(parts[1]));
 	}
 	
 	private String threeDigitSuffix(String suffix) {
