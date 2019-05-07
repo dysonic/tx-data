@@ -9,9 +9,20 @@ public class AccountTest {
 	Account accountOne = new Account("11-1111-1111111-111");
 	Account accountTwo = new Account("22-2222-2222222-222");	
 	Account accountThree = new Account("11-1111-1111111-111");
+	Account accountEmpty = new Account();
 	
 	@Test
-	public void testParse() {
+	public void testConstructor() {
+		assertEquals("00", accountEmpty.getBank());
+		assertEquals("0000", accountEmpty.getBranch());
+		assertEquals("0000000", accountEmpty.getAccountNumber());
+		assertEquals("000", accountEmpty.getSuffix());
+		assertEquals("", accountEmpty.getType());
+		assertEquals("", accountEmpty.getAlias());
+	}
+	
+	@Test
+	public void testConstructorWithAccount() {
 		Account account = new Account("BB-bbbb-AAAAAAA-SSS");
 
 		assertEquals("BB", account.getBank());
@@ -37,4 +48,18 @@ public class AccountTest {
 		assertFalse(accountTwo.equals(accountOne));
 		assertFalse(accountTwo.equals(accountThree));
 	}
+	
+	@Test
+	public void testToString() {
+		assertEquals("11-1111-1111111-111", accountOne.toString());
+		assertEquals("22-2222-2222222-222", accountTwo.toString());
+		assertEquals("11-1111-1111111-111", accountThree.toString());;
+	}
+	
+	@Test
+	public void testHasEmptyAccountNumber() {
+		assertTrue(accountEmpty.hasEmptyAccountNumber());
+		assertFalse(accountOne.hasEmptyAccountNumber());
+	}
+	
 }
