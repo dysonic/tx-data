@@ -2,7 +2,7 @@ package txdata;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
 public class Transaction implements java.io.Serializable {
 
@@ -66,14 +66,10 @@ public class Transaction implements java.io.Serializable {
 		this.details = details;
 	}
 
-	@JsonIgnore
+	@JsonIdentityReference
 	public TxData getTxData() {
 		return txData;
 	}
-
-    public int getTxDataId() {
-        return txData.getId();
-    }
     
 	public void setTxData(TxData txData) {
 		this.txData = txData;
@@ -87,14 +83,10 @@ public class Transaction implements java.io.Serializable {
 		this.txSequence = sequence;
 	}
 
-	@JsonIgnore
+	@JsonIdentityReference
 	public Account getAccount() {
 		return account;
 	}
-
-    public int getAccountId() {
-        return account.getId();
-    }
     
 	public void setAccount(Account account) {
 		this.account = account;

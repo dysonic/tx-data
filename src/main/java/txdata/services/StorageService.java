@@ -75,4 +75,15 @@ public class StorageService {
 			session.save(tx);
 		}
 	}
+	
+	public List<Transaction> getTransactions() {
+		Query<Transaction> query = session.createQuery("from Transaction", Transaction.class);
+		return query.list();
+	}
+
+	public Transaction getTransaction(int id) {
+		Query<Transaction> query = session.createQuery("from Transaction where id = :id", Transaction.class);
+		query.setParameter("id", id, IntegerType.INSTANCE);
+		return query.uniqueResult();
+	}
 }
