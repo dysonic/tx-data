@@ -2,6 +2,7 @@ package txdata.services;
 
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hibernate.type.IntegerType;
@@ -31,10 +32,19 @@ public class StorageService {
 		session.getTransaction().commit();
 	}
 
-	public Account getAccount(int id) {
-		Query<Account> query = session.createQuery("from Account where id = :id", Account.class);
+	public TxData getTxData(int id) {
+		Query<TxData> query = session.createQuery("from TxData where id = :id", TxData.class);
 		query.setParameter("id", id, IntegerType.INSTANCE);
-		return query.uniqueResult();
+		System.out.println("Before query txdata");
+		TxData txData = query.uniqueResult();
+		System.out.println("Before initialize account");
+		Hibernate.initialize(txData.getAccount());
+		System.out.println(txData.getAccount().toString() + " #" + txData.getAccount().getId());
+//		System.out.println("Before initialize transactions");
+//		Hibernate.initialize(txData.getTransactions());
+//		System.out.println(txData.getTransactions().size());
+		System.out.println("Before serialization");
+		return txData;
 	}
 
 	public List<Account> getAccounts() {
@@ -42,14 +52,20 @@ public class StorageService {
 		return query.list();
 	}
 
+	public Account getAccount(int id) {
+		Query<Account> query = session.createQuery("from Account where id = :id", Account.class);
+		query.setParameter("id", id, IntegerType.INSTANCE);
+		return query.uniqueResult();
+	}
+
 	private void useStoredAccountOrSaveAccount(TxData txData) {
 		Account account = txData.getAccount();
-        List<Account> accounts = getAccounts();
-        if (accounts.contains(account)) {
-        	txData.setAccount(accounts.get(accounts.indexOf(account)));
-        } else {
-        	session.save(account);        	
-        }
+		List<Account> accounts = getAccounts();
+		if (accounts.contains(account)) {
+			txData.setAccount(accounts.get(accounts.indexOf(account)));
+		} else {
+			session.save(account);
+		}
 	}
 
 	private void saveTransactions(TxData txData) {

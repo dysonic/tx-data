@@ -3,6 +3,9 @@ package txdata;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 
 public class TxData implements java.io.Serializable {
@@ -15,11 +18,11 @@ public class TxData implements java.io.Serializable {
 	private Account account;
 	private LocalDate startDate;
 	private LocalDate endDate;
-	private ArrayList<Transaction> transactions;
+	private List<Transaction> transactions;
 	private LocalDateTime uploadTime;
 
 	public TxData() {
-		transactions = new ArrayList<Transaction>();
+		transactions = (List<Transaction>) new ArrayList<Transaction>();
 	}
 
 	public LocalDate getStartDate() {
