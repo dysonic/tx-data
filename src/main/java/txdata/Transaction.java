@@ -2,14 +2,13 @@ package txdata;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Transaction implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private int id;
-	private TransactionType type;
 	private LocalDate date;
 	private float amount;
 	private String name;
@@ -24,14 +23,6 @@ public class Transaction implements java.io.Serializable {
 	
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public TransactionType getType() {
-		return type;
-	}
-
-	public void setType(TransactionType type) {
-		this.type = type;
 	}
 
 	public LocalDate getDate() {
@@ -66,9 +57,16 @@ public class Transaction implements java.io.Serializable {
 		this.details = details;
 	}
 
-	@JsonIdentityReference
+	@JsonIgnore
 	public TxData getTxData() {
 		return txData;
+	}
+	
+	public int getTxDataId() {
+		if (txData != null) {			
+			return txData.getId();
+		}
+		return 0;
 	}
     
 	public void setTxData(TxData txData) {
@@ -83,9 +81,16 @@ public class Transaction implements java.io.Serializable {
 		this.txSequence = sequence;
 	}
 
-	@JsonIdentityReference
+	@JsonIgnore
 	public Account getAccount() {
 		return account;
+	}
+	
+	public int getAccountId() {
+		if (account != null) {
+			return account.getId();
+		}
+		return 0;
 	}
     
 	public void setAccount(Account account) {

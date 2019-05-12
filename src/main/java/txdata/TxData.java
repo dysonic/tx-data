@@ -65,6 +65,10 @@ public class TxData implements java.io.Serializable {
 		return transactions;
 	}
 
+	public void setTransactions(List<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
 	public String getFilename() {
 		return filename;
 	}

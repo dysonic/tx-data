@@ -10,7 +10,6 @@ public class TransactionBuilder implements ObjectBuilder {
 
 	Logger logger = LoggerFactory.getLogger(LoggingController.class);
 	
-	private static final String TYPE =  "TRNTYPE";
 	private static final String DATE_POSTED =  "DTPOSTED";
 	private static final String AMOUNT =  "TRNAMT";
 	private static final String NAME = "NAME";
@@ -24,19 +23,9 @@ public class TransactionBuilder implements ObjectBuilder {
 		transaction.setTxSequence(sequence);
 	}
 	
-	private void setTransactionTypeFromValue(String value) {
-		if (value.equals("DEBIT")) {
-			transaction.setType(TransactionType.DEBIT);
-		}
-		if (value.equals("CREDIT")) {
-			transaction.setType(TransactionType.CREDIT);
-		}
-	}
-	
 	@Override
 	public void add(String tagName, String value) {
 		switch(tagName) {
-			case TYPE: setTransactionTypeFromValue(value); break;
 			case DATE_POSTED: transaction.setDate(LocalDate.parse(value, formatter)); break;
 			case AMOUNT: transaction.setAmount(Float.parseFloat(value)); break;
 			case NAME: transaction.setName(value); break;

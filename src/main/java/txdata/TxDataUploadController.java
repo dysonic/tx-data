@@ -34,9 +34,8 @@ public class TxDataUploadController {
 		return "acceptable MIME type:" + MediaType.APPLICATION_JSON_VALUE;
 	}
 
-	@PostMapping(value = "/api/tx-data/upload", produces = "application/json")
-	@ResponseBody
-	public TxData handleFileUpload(@RequestParam("file") final MultipartFile file) throws Exception {
+	@PostMapping(value = "/api/tx-data/upload")
+	public @ResponseBody TxData handleFileUpload(@RequestParam("file") final MultipartFile file) throws Exception {
 		String filename = file.getOriginalFilename();
 		long size = file.getSize();
 		logger.info("uploadFile: " + filename + " (" + size + " bytes)");

@@ -40,9 +40,14 @@ public class StorageService {
 		System.out.println("Before initialize account");
 		Hibernate.initialize(txData.getAccount());
 		System.out.println(txData.getAccount().toString() + " #" + txData.getAccount().getId());
-//		System.out.println("Before initialize transactions");
-//		Hibernate.initialize(txData.getTransactions());
-//		System.out.println(txData.getTransactions().size());
+		System.out.println("Before fetch transactions");
+		List<Transaction> transactions = getTransactionsFromTxData(txData);
+		System.out.println(transactions.size());
+		for (Transaction tx : transactions) {
+			tx.setTxData(txData);
+			tx.setAccount(txData.getAccount());
+		}
+		txData.setTransactions(transactions);
 		System.out.println("Before serialization");
 		return txData;
 	}
@@ -81,6 +86,12 @@ public class StorageService {
 		return query.list();
 	}
 
+	public List<Transaction> getTransactionsFromTxData(TxData txData) {
+		Query<Transaction> query = session.createQuery("from Transaction where txData = :txData", Transaction.class);
+		query.setParameter("txData", txData);
+		return query.list();
+	}
+	
 	public Transaction getTransaction(int id) {
 		Query<Transaction> query = session.createQuery("from Transaction where id = :id", Transaction.class);
 		query.setParameter("id", id, IntegerType.INSTANCE);
