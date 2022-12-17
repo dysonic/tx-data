@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react'
+import { Link } from 'react-router-dom'
 // import "./App.css";
 
 function NavBar() {
@@ -6,11 +7,11 @@ function NavBar() {
     <nav>
       <ul>
         <li>
-          <a href="upload">Upload</a>
+          <Link to="/upload">Upload</Link>
         </li>
       </ul>
     </nav>
-  );
+  )
 }
 
-export default NavBar;
+export default NavBar

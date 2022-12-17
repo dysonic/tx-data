@@ -1,28 +1,28 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import NavBar from "./NavBar";
-import Dashboard from "./routes/Dashboard";
-import Upload from "./routes/Upload";
+import React from 'react'
+import logo from './logo.svg'
+import './App.css'
+import { createBrowserRouter, RouterProvider, Link } from 'react-router-dom'
+import NavBar from './NavBar'
+import Dashboard from './routes/Dashboard'
+import { Upload } from './routes/Upload'
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <Dashboard />,
   },
   {
-    path: "/upload",
+    path: '/upload',
     element: <Upload />,
   },
-]);
+])
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
         <h1>
-          <a href={`/`}>TX-DATA</a>
+          <Link to="/">TX-DATA</Link>
         </h1>
         <NavBar />
         <hr />
@@ -31,7 +31,7 @@ function App() {
         <RouterProvider router={router} />
       </main>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
