@@ -25,9 +25,9 @@ export const Upload = () => {
     }
 
     const formData = new FormData()
-    formData.append('File', selectedFile)
+    formData.append('file', selectedFile)
 
-    fetch('http://localhost:8080/rest/upload', {
+    fetch('/api/upload', {
       method: 'POST',
       body: formData,
     })
