@@ -2,14 +2,26 @@
 
 WIP: This is me playing around with storing banking transactions on AWS DynamoDB so I can tag and group them so I can get idea on my spending.
 
-# Getting start
+## Disclaimer
+
+This is not production ready code and is for educational purposes only.
+
+## Getting started
+
+1. Copy `.env` to `.env`. The environment variables are embedded during build time.
+2. Update `.env.local`environment variables with the TX_DATA_API_ENDPOINT e.g.
+   `https://mytxdataapi.execute-api.us-west-1.amazonaws.com`.
+
+This needs to be and AWS API Gateway endpoint where you have set up the [tx-data-api](https://github.com/dysonic/tx-data-api) project.
+
+3. Install modules and start server:
 
 ```
 yarn
 yarn start
 ```
 
-# Getting Started with Create React App
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

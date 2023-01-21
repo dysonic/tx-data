@@ -1,12 +1,10 @@
-import React from "react";
+import React from 'react'
 // import "./App.css";
 
-function Dashboard() {
+export const Dashboard = () => {
   return (
     <div className="Dashboard">
-      <p>I am the dashboard.</p>
+      <h1>Dashboard</h1>
     </div>
-  );
+  )
 }
-
-export default Dashboard;

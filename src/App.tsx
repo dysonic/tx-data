@@ -3,7 +3,7 @@ import logo from './logo.svg'
 import './App.css'
 import { createBrowserRouter, RouterProvider, Link } from 'react-router-dom'
 import NavBar from './NavBar'
-import Dashboard from './routes/Dashboard'
+import { Dashboard } from './routes/Dashboard'
 import { Upload } from './routes/Upload'
 
 const router = createBrowserRouter([

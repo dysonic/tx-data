@@ -2,9 +2,13 @@ import React, { useState, ChangeEvent } from 'react'
 import format from 'date-fns/format'
 // import "./Upload.css";
 
+const { REACT_APP_TX_DATA_API: api } = process.env
+
 export const Upload = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [isFilePicked, setIsFilePicked] = useState(false)
+  const [isBusy, setIsBusy] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const lastModifiedDate = selectedFile
     ? format(selectedFile.lastModified, 'dd/MM/yyyy hh:mm bb')
@@ -15,7 +19,6 @@ export const Upload = () => {
     const file = files ? files[0] : null
     if (file) {
       setSelectedFile(file)
-      setIsFilePicked(true)
     }
   }
 
@@ -24,44 +27,93 @@ export const Upload = () => {
       return
     }
 
+    setSuccessMessage(null)
+    setErrorMessage(null)
+
     const formData = new FormData()
     formData.append('file', selectedFile)
 
-    fetch('/api/upload', {
+    setIsBusy(true)
+    fetch(`${api}/uploadFile`, {
       method: 'POST',
       body: formData,
     })
       .then((response) => response.json())
       .then((result) => {
-        console.log('Success:', result)
+        setSuccessMessage(`File '${result.filesUploaded[0]} uploaded.`)
       })
       .catch((error) => {
-        console.error('Error:', error)
+        setErrorMessage(error.message)
+      })
+      .finally(() => {
+        setIsBusy(false)
       })
   }
+  const isUploadButtonDisabled = !selectedFile || isBusy
+  const showFileInfo = selectedFile && !successMessage
 
   return (
-    <div className="Dashboard">
-      <div>
-        <input type="file" name="file" onChange={changeHandler} />
-        {isFilePicked && selectedFile ? (
-          <div>
-            <ul>
-              <li>Filename: {selectedFile.name}</li>
-              <li>Filetype: {selectedFile.type}</li>
-              <li>Size in bytes: {selectedFile.size}</li>
-              <li>Last modified date: {lastModifiedDate}</li>
-            </ul>
-          </div>
-        ) : (
-          <p>Select an Open Financial Exchange (OFX) file to upload.</p>
-        )}
-        <div>
-          <button disabled={!isFilePicked} onClick={handleSubmission}>
-            Upload
-          </button>
+    <div className="Upload">
+      <h1>
+        Upload <small>Upload banking transactions</small>
+      </h1>
+      {successMessage && (
+        <div className="error-message">
+          <p>{successMessage}</p>
         </div>
-      </div>
+      )}
+      {errorMessage && (
+        <div className="error-message">
+          <p>{errorMessage}</p>
+        </div>
+      )}
+
+      <form>
+        <fieldset>
+          <legend>File upload</legend>
+          <p>Select an Open Financial Exchange (OFX) file to upload:</p>
+          <div className="row">
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="file">File</label>
+              <input
+                type="file"
+                id="file"
+                name="file"
+                onChange={changeHandler}
+              />
+              {showFileInfo && (
+                <div className="input-group">
+                  <label htmlFor="filesize">Size</label>
+                  <input
+                    type="text"
+                    id="size"
+                    readOnly={true}
+                    value={selectedFile.size}
+                  />
+                  <label htmlFor="last-modified">Last modified</label>
+                  <input
+                    type="text"
+                    id="last-modified"
+                    readOnly={true}
+                    value={lastModifiedDate}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-sm-12 col-md-6">
+              <button
+                className="primary"
+                disabled={isUploadButtonDisabled}
+                onClick={handleSubmission}
+              >
+                Upload
+              </button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
     </div>
   )
 }

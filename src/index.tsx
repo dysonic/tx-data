@@ -9,14 +9,17 @@ import {
   Route,
   RouterProvider,
 } from 'react-router-dom'
-import Dashboard from './routes/Dashboard'
+import { ErrorPage } from './ErrorPage'
+import { Dashboard } from './routes/Dashboard'
 import { Upload } from './routes/Upload'
+import { Categorize } from './routes/Categorize'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<AppLayout />}>
+    <Route element={<AppLayout />} errorElement={<ErrorPage />}>
       <Route path="/" element={<Dashboard />} />
       <Route path="/upload" element={<Upload />} />
+      <Route path="/categorize" element={<Categorize />} />
     </Route>
   )
 )

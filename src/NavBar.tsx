@@ -5,11 +5,8 @@ import { Link } from 'react-router-dom'
 function NavBar() {
   return (
     <nav>
-      <ul>
-        <li>
-          <Link to="/upload">Upload</Link>
-        </li>
-      </ul>
+      <Link to="/upload">Upload</Link>
+      <Link to="/categorize">Categorize</Link>
     </nav>
   )
 }
