@@ -57,6 +57,9 @@ export const Categorize = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
   const [newCategory, setNewCategory] = useState<string>('')
+  const [isBusy, setIsBusy] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const getUncategorizedTransactions = async () => {
     setIsLoading(true)
@@ -99,6 +102,33 @@ export const Categorize = () => {
     transactions.length && tx
       ? transactions.filter((tf) => isTxSimilar(tf, tx))
       : []
+
+  const handleNewCategory = () => {
+    setSuccessMessage(null)
+    setErrorMessage(null)
+    setIsBusy(true)
+    const data = {
+      newCategory,
+      transactionId: tx?.id,
+    }
+    fetch(`${api}/categorizeTransaction`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        setSuccessMessage(`File '${result.filesUploaded[0]} uploaded.`)
+      })
+      .catch((error) => {
+        setErrorMessage(error.message)
+      })
+      .finally(() => {
+        setIsBusy(false)
+      })
+  }
 
   return (
     <div className="Categorize">
@@ -159,7 +189,13 @@ export const Categorize = () => {
                       value={newCategory}
                       onChange={handleNewCategoryChange}
                     />
-                    <button className="primary">Categorize</button>
+                    <button
+                      type="button"
+                      className="primary"
+                      onClick={handleNewCategory}
+                    >
+                      Categorize
+                    </button>
                   </div>
                 </div>
               </div>

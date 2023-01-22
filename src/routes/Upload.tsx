@@ -1,5 +1,6 @@
-import React, { useState, ChangeEvent } from 'react'
+import React, { useState, useEffect, ChangeEvent } from 'react'
 import format from 'date-fns/format'
+import { niceBytes } from '../utils/size'
 // import "./Upload.css";
 
 const { REACT_APP_TX_DATA_API: api } = process.env
@@ -10,13 +11,22 @@ export const Upload = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  useEffect(() => {
+    const fileInputElement = document.querySelector('#file')
+    if (
+      fileInputElement &&
+      !(fileInputElement as HTMLInputElement).files?.length
+    ) {
+      setSelectedFile(null)
+    }
+  }, [])
   const lastModifiedDate = selectedFile
     ? format(selectedFile.lastModified, 'dd/MM/yyyy hh:mm bb')
     : ''
 
-  const changeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target
-    const file = files ? files[0] : null
+    const file = files?.length ? files[0] : null
     if (file) {
       setSelectedFile(file)
     }
@@ -79,17 +89,21 @@ export const Upload = () => {
                 type="file"
                 id="file"
                 name="file"
-                onChange={changeHandler}
+                onChange={handleFileChange}
               />
               {showFileInfo && (
                 <div className="input-group">
                   <label htmlFor="filesize">Size</label>
                   <input
+                    className=""
                     type="text"
                     id="size"
                     readOnly={true}
-                    value={selectedFile.size}
+                    value={niceBytes(selectedFile.size)}
                   />
+                  {/* <label htmlFor="file" className="button">
+                    Upload file
+                  </label> */}
                   <label htmlFor="last-modified">Last modified</label>
                   <input
                     type="text"
