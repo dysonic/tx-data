@@ -18,6 +18,11 @@ interface DbTransaction {
   bank_account_id: string
 }
 
+interface CategorizePayload {
+  newCategory?: string
+  transactions: Array<string>
+}
+
 export const mapDbTxToTransaction = (dbTx: DbTransaction) => {
   const {
     id,
@@ -52,6 +57,9 @@ export const isTxSimilar = (a: Transaction, b: Transaction) => {
 
 export const Categorize = () => {
   const [transactions, setTransactions] = useState<Array<Transaction>>([])
+  const [tx, setTx] = useState<Transaction | null>(null)
+  const [similarTxs, setSimilarTxs] = useState<Array<Transaction>>([])
+  const [selectedTxIds, setSelectedTxIds] = useState<Array<string>>([])
   const [isMore, setIsMore] = useState<boolean>(false)
   const [txIndex, setTxIndex] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -65,7 +73,9 @@ export const Categorize = () => {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${api}/getUncategorizedTransactions`)
+      const response = await fetch(`${api}/getUncategorizedTransactions`, {
+        // headers,
+      })
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`)
       }
@@ -74,16 +84,42 @@ export const Categorize = () => {
         transactions: dbTransactions,
       } = await response.json()
       setIsMore(isMore)
-      const txs = dbTransactions
+      const _txs = dbTransactions
         .map(mapDbTxToTransaction)
         .sort((a: Transaction, b: Transaction) => b.amount - a.amount)
-      setTransactions(txs)
+      setTransactions(_txs)
+      if (_txs.length) {
+        const _tx = _txs[txIndex]
+        setTx(_tx)
+        const _similiarTxs = getSimilarTxs(_tx, _txs)
+        setSimilarTxs(_similiarTxs)
+        setSelectedTxIds(_similiarTxs.map((stx) => stx.id))
+      }
     } catch (error) {
       console.error('Error:', error)
       setError(error as Error)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const getSimilarTxs = (_tx: Transaction, _txs: Array<Transaction>) => {
+    return _txs.filter((tf) => isTxSimilar(tf, _tx))
+  }
+
+  const handleTxToggle = (txId: string) => {
+    const isSelected = selectedTxIds.includes(txId)
+    console.log(
+      'handleTxToggle - tx:',
+      txId,
+      'isSelected (current):',
+      isSelected
+    )
+    if (isSelected) {
+      setSelectedTxIds(selectedTxIds.filter((id) => id !== txId))
+      return
+    }
+    setSelectedTxIds(selectedTxIds.concat(txId))
   }
 
   const handleNewCategoryChange = (ev: ChangeEvent<HTMLInputElement>) => {
@@ -97,25 +133,27 @@ export const Categorize = () => {
     getUncategorizedTransactions()
   }, [])
 
-  const tx = transactions.length ? transactions[txIndex] : null
-  const similarTxs =
-    transactions.length && tx
-      ? transactions.filter((tf) => isTxSimilar(tf, tx))
-      : []
-
   const handleNewCategory = () => {
+    if (!tx) {
+      return
+    }
+
     setSuccessMessage(null)
     setErrorMessage(null)
     setIsBusy(true)
-    const data = {
-      newCategory,
-      transactionId: tx?.id,
+
+    const _txs = [tx.id].concat(selectedTxIds)
+    const data: CategorizePayload = {
+      transactions: _txs,
     }
+    if (newCategory) {
+      data.newCategory = newCategory
+    }
+    const headers = new Headers()
+    headers.append('Content-Type', 'application/json; charset=utf-8')
     fetch(`${api}/categorizeTransaction`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
+      headers,
       body: JSON.stringify(data),
     })
       .then((response) => response.json())
@@ -177,6 +215,8 @@ export const Categorize = () => {
                 <TransactionTable
                   title="Similar transactions"
                   transactions={similarTxs}
+                  selectedTxIds={selectedTxIds}
+                  handleTxToggle={handleTxToggle}
                 />
               )}
               <div className="container">
