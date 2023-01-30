@@ -12,7 +12,10 @@ import {
 import { ErrorPage } from './ErrorPage'
 import { Dashboard } from './routes/Dashboard'
 import { Upload } from './routes/Upload'
-import { Categorize } from './routes/Categorize'
+// import { Categorize } from './routes/Categorize'
+import { Categorize } from './features/transaction/routes/Categorize'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './lib/react-query'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,7 +30,9 @@ const router = createBrowserRouter(
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </React.StrictMode>
 )
 

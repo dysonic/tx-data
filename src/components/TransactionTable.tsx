@@ -3,7 +3,7 @@ import format from 'date-fns/format'
 import { Transaction } from '../types/transaction'
 
 export const TransactionTable = (props: {
-  title: string
+  title?: string
   transactions: Array<Transaction>
   selectedTxIds?: Array<string>
   handleTxToggle?(txId: string): void
@@ -12,7 +12,7 @@ export const TransactionTable = (props: {
 
   return (
     <table className="striped">
-      <caption>{title}</caption>
+      {title && <caption>{title}</caption>}
       <thead>
         <tr>
           {handleTxToggle && <th>&nbsp;</th>}

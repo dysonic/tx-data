@@ -2,6 +2,7 @@ import React, { useState, useEffect, ChangeEvent } from 'react'
 import format from 'date-fns/format'
 import { Transaction } from '../types/transaction'
 import { TransactionTable } from '../components/TransactionTable'
+import { Category } from '../types/category'
 
 // import "./Categorize.css";
 
@@ -60,6 +61,7 @@ export const Categorize = () => {
   const [tx, setTx] = useState<Transaction | null>(null)
   const [similarTxs, setSimilarTxs] = useState<Array<Transaction>>([])
   const [selectedTxIds, setSelectedTxIds] = useState<Array<string>>([])
+  const [categories, setCategories] = useState<Array<Category>>([])
   const [isMore, setIsMore] = useState<boolean>(false)
   const [txIndex, setTxIndex] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -73,15 +75,20 @@ export const Categorize = () => {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${api}/getUncategorizedTransactions`, {
-        // headers,
-      })
+      let url = `${api}/getUncategorizedTransactions`
+      const includeCategories = transactions.length === 0
+      if (includeCategories) {
+        url += '?include=categories'
+      }
+
+      const response = await fetch(url)
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`)
       }
       const {
         meta: { isMore },
         transactions: dbTransactions,
+        categories,
       } = await response.json()
       setIsMore(isMore)
       const _txs = dbTransactions
@@ -94,6 +101,9 @@ export const Categorize = () => {
         const _similiarTxs = getSimilarTxs(_tx, _txs)
         setSimilarTxs(_similiarTxs)
         setSelectedTxIds(_similiarTxs.map((stx) => stx.id))
+      }
+      if (includeCategories) {
+        setCategories(categories)
       }
     } catch (error) {
       console.error('Error:', error)
@@ -158,7 +168,11 @@ export const Categorize = () => {
     })
       .then((response) => response.json())
       .then((result) => {
-        setSuccessMessage(`File '${result.filesUploaded[0]} uploaded.`)
+        console.log('result:', result)
+        if (result?.category) {
+          setCategories(categories.concat(result?.category))
+          setNewCategory('')
+        }
       })
       .catch((error) => {
         setErrorMessage(error.message)
@@ -211,32 +225,52 @@ export const Categorize = () => {
                 readOnly={true}
                 value={tx.amount.toFixed(2)}
               />
-              {similarTxs.length > 0 && (
+            </fieldset>
+            {similarTxs.length > 0 && (
+              <fieldset>
+                <legend>Similar transactions</legend>
                 <TransactionTable
-                  title="Similar transactions"
                   transactions={similarTxs}
                   selectedTxIds={selectedTxIds}
                   handleTxToggle={handleTxToggle}
                 />
-              )}
-              <div className="container">
+              </fieldset>
+            )}
+            <fieldset>
+              <legend>Catgeorize</legend>
+              {categories.length > 0 && (
                 <div className="row">
                   <div className="input-group">
-                    <label htmlFor="category">New category</label>
-                    <input
-                      type="text"
-                      id="category"
-                      value={newCategory}
-                      onChange={handleNewCategoryChange}
-                    />
-                    <button
-                      type="button"
-                      className="primary"
-                      onClick={handleNewCategory}
-                    >
-                      Categorize
-                    </button>
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        className="primary"
+                        onClick={handleNewCategory}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
                   </div>
+                </div>
+              )}
+              <div className="row">
+                <div className="input-group">
+                  <label htmlFor="category">New category name</label>
+                  <input
+                    type="text"
+                    id="category"
+                    value={newCategory}
+                    autoComplete="off"
+                    onChange={handleNewCategoryChange}
+                  />
+                  <button
+                    type="button"
+                    className="primary"
+                    onClick={handleNewCategory}
+                  >
+                    Categorize
+                  </button>
                 </div>
               </div>
             </fieldset>
