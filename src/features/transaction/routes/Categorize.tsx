@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 // import { useQueryClient } from '@tanstack/react-query'
 import { useUncategorizedTransactions } from '../api/getUncategorizedTransactions'
-import { redirect } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 export const Categorize = () => {
   const [txIndex, setTxIndex] = useState<number>(0)
+  const navigate = useNavigate()
 
   // const queryClient = useQueryClient()
 
@@ -20,7 +21,7 @@ export const Categorize = () => {
 
   if (query && query.data && query.data.transactions?.length > 0) {
     const tx = query.data.transactions[txIndex]
-    redirect(`/categorize/${tx.id}`)
+    navigate(`/categorize/${tx.id}`)
     return (
       <>
         <h1>Please wait...</h1>

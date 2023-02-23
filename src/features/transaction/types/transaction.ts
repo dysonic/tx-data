@@ -9,13 +9,6 @@ export interface Transaction {
   bankAccountId: string
 }
 
-export interface DbTransaction {
-  id: string
-  third_party_tx_id: string
-  date_posted: string
-  amount: string
-  description: string
-  notes: string
-  type: string
-  bank_account_id: string
+export type DbTransaction = Omit<Transaction, 'datePosted'> & {
+  datePosted: string
 }

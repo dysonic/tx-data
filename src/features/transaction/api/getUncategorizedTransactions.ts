@@ -23,27 +23,11 @@ export interface UncategorizedTransactionsResponse {
 }
 
 export const mapDbTxToTransaction = (dbTx: DbTransaction): Transaction => {
-  const {
-    id,
-    third_party_tx_id: thirdPartyTxId,
-    date_posted: dbDatePosted,
-    amount: dbAmount,
-    description,
-    notes,
-    type,
-    bank_account_id: bankAccountId,
-  } = dbTx
+  const { datePosted: dbDatePosted, ...rest } = dbTx
   const datePosted = new Date(dbDatePosted)
-  const amount = Math.abs(Number(dbAmount.replace('$', '')))
   return {
-    id,
-    thirdPartyTxId,
     datePosted,
-    amount,
-    description,
-    notes,
-    type,
-    bankAccountId,
+    ...rest,
   }
 }
 
