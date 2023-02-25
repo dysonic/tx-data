@@ -12,8 +12,8 @@ import {
 import { ErrorPage } from './ErrorPage'
 import { Dashboard } from './routes/Dashboard'
 import { Upload } from './routes/Upload'
-// import { Categorize } from './routes/Categorize'
 import { Categorize } from './features/transaction/routes/Categorize'
+import { AutoSelectTx } from './features/transaction/routes/AutoSelectTx'
 import { CategorizeTransaction } from './features/transaction/routes/CategorizeTransaction'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/react-query'
@@ -23,11 +23,12 @@ const router = createBrowserRouter(
     <Route element={<AppLayout />} errorElement={<ErrorPage />}>
       <Route path="/" element={<Dashboard />} />
       <Route path="/upload" element={<Upload />} />
-      <Route path="/categorize/:txId" element={<CategorizeTransaction />} />
-      <Route path="/categorize" element={<Categorize />} />
-      {/* <Route path="/categorize" element={<Categorize />}>
+      {/* <Route path="/categorize/:txId" element={<CategorizeTransaction />} /> */}
+      {/* <Route path="/categorize" element={<Categorize />} /> */}
+      <Route path="/categorize" element={<Categorize />}>
         <Route path=":txId" element={<CategorizeTransaction />} />
-      </Route> */}
+        <Route path="" element={<AutoSelectTx />} />
+      </Route>
     </Route>
   )
 )
