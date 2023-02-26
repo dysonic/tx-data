@@ -4,7 +4,7 @@ import { Transaction, DbTransaction } from '../types/transaction'
 import { Category } from '../../../types/category'
 import { AxiosResponse } from 'axios'
 
-interface Meta {
+export interface Meta {
   isMore: boolean
   txTotal: number
   txUncategorized: number
@@ -62,6 +62,6 @@ export const getUncategorizedTransactions = (
 export const useUncategorizedTransactions = () => {
   return useQuery({
     queryKey: ['uncategorizedTransactions'],
-    queryFn: () => getUncategorizedTransactions(),
+    queryFn: () => getUncategorizedTransactions(true),
   })
 }

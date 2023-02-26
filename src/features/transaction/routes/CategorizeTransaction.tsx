@@ -1,17 +1,17 @@
-import React, { useState, useEffect, ChangeEvent } from 'react'
-import { useOutletContext, useParams } from 'react-router-dom'
+import React, { useState, useEffect, ChangeEvent, MouseEvent } from 'react'
+import { useOutletContext, useParams, useNavigate } from 'react-router-dom'
 import format from 'date-fns/format'
 import { Transaction } from '../types/transaction'
 import { TransactionTable } from '../../../components/TransactionTable'
 import { Category } from '../../../types/category'
+import {
+  useCategorizeTransaction,
+  CategorizeTransactionPayload,
+} from '../api/categorizeTransaction'
+// import { categorizeTransaction } from '../api/categorizeTransaction'
+// import { useMutation } from '@tanstack/react-query'
+import { Meta } from '../api/getUncategorizedTransactions'
 // import "./Categorize.css";
-
-const { REACT_APP_TX_DATA_API: api } = process.env
-
-interface CategorizePayload {
-  newCategory?: string
-  transactions: Array<string>
-}
 
 const getSimilarTxs = (tx: Transaction, txs: Array<Transaction>) => {
   return txs.filter((tf) => isTxSimilar(tf, tx))
@@ -28,23 +28,32 @@ const isTxSimilar = (a: Transaction, b: Transaction) => {
 
 export const CategorizeTransaction = () => {
   const { txId } = useParams()
-  const data: { transactions: Array<Transaction> } = useOutletContext()
+  const data: {
+    transactions: Array<Transaction>
+    categories: Array<Category>
+    meta: Meta
+  } = useOutletContext()
   const [tx, setTx] = useState<Transaction | null>(null)
   const [txIndex, setTxIndex] = useState<number>(0)
   const [similarTxs, setSimilarTxs] = useState<Array<Transaction>>([])
   const [selectedTxIds, setSelectedTxIds] = useState<Array<string>>([])
   const [categories, setCategories] = useState<Array<Category>>([])
-  const [isMore, setIsMore] = useState<boolean>(false)
+  const [hasNext, setHasNext] = useState<boolean>(false)
+  const [newCategoryLabel, setNewCategoryLabel] = useState<string>('')
+  const mutation = useCategorizeTransaction()
+  const navigate = useNavigate()
+  // const mutation = useMutation({
+  //   mutationFn: categorizeTransaction,
+  //   onSuccess: (data, variables, context) => {
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<Error | null>(null)
-  const [newCategory, setNewCategory] = useState<string>('')
-  const [isBusy, setIsBusy] = useState(false)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  //   },
+  // })
 
   useEffect(() => {
     const _txs = data?.transactions || []
+    if (!txId) {
+      return
+    }
     const _txIndex = _txs.findIndex((t) => t.id === txId)
     if (_txIndex === -1) {
       return
@@ -52,11 +61,15 @@ export const CategorizeTransaction = () => {
     const _tx = _txs[_txIndex]
     const _similarTxs = getSimilarTxs(_tx, _txs)
     const _selectedTxIds = _similarTxs.map((stx) => stx.id)
+    const _categories = data?.categories || []
+    const _hasNext = _txIndex + 1 < _txs.length || data.meta.isMore
     setTx(_tx)
     setTxIndex(_txIndex)
     setSimilarTxs(_similarTxs)
     setSelectedTxIds(_selectedTxIds)
-  }, [])
+    setCategories(_categories)
+    setHasNext(_hasNext)
+  }, ['txId'])
 
   const handleTxToggle = (txId: string) => {
     const isSelected = selectedTxIds.includes(txId)
@@ -73,47 +86,59 @@ export const CategorizeTransaction = () => {
     setSelectedTxIds(selectedTxIds.concat(txId))
   }
 
-  const handleNewCategoryChange = (ev: ChangeEvent<HTMLInputElement>) => {
-    setNewCategory(ev.target.value)
+  const handleCategoryClick = (category: Category) => {
+    const payload = {
+      category: category.id,
+      transactions: [txId as string].concat(selectedTxIds),
+    }
+    doCategorizeMutationAndHandleResponse(payload)
   }
 
   const handleNewCategory = () => {
-    if (!tx) {
-      return
+    const payload = {
+      categoryLabel: newCategoryLabel,
+      transactions: [txId as string].concat(selectedTxIds),
     }
+    doCategorizeMutationAndHandleResponse(payload)
+  }
 
-    setSuccessMessage(null)
-    setErrorMessage(null)
-    setIsBusy(true)
+  const doCategorizeMutationAndHandleResponse = async (
+    payload: CategorizeTransactionPayload
+  ) => {
+    try {
+      const resp = await mutation.mutateAsync(payload)
 
-    const _txs = [tx.id].concat(selectedTxIds)
-    const data: CategorizePayload = {
-      transactions: _txs,
-    }
-    if (newCategory) {
-      data.newCategory = newCategory
-    }
-    const headers = new Headers()
-    headers.append('Content-Type', 'application/json; charset=utf-8')
-    fetch(`${api}/categorizeTransaction`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        console.log('result:', result)
-        if (result?.category) {
-          setCategories(categories.concat(result?.category))
-          setNewCategory('')
+      // Add new category (as appropriate)
+      if (resp) {
+        setCategories(categories.concat(resp.category))
+        setNewCategoryLabel('')
+      }
+
+      // Find next transaction
+      const nextTxIndex = txIndex + 1
+      if (nextTxIndex < data.transactions.length) {
+        const nextTxs = data.transactions.slice(nextTxIndex)
+        const nextTx = nextTxs.find((t) => !selectedTxIds.includes(t.id))
+
+        // If we have another tx to categorize go to that page
+        if (nextTx) {
+          navigate(`/categorize/${nextTx.id}`)
+          return
         }
-      })
-      .catch((error) => {
-        setErrorMessage(error.message)
-      })
-      .finally(() => {
-        setIsBusy(false)
-      })
+
+        // Are there any more uncategorized transactions? Fetch them.
+        if (data.meta.isMore) {
+          navigate('/categorize')
+          return
+        }
+
+        // Otherwise go to home page.
+        navigate('/')
+        return
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   if (!tx) {
@@ -168,7 +193,7 @@ export const CategorizeTransaction = () => {
           </fieldset>
         )}
         <fieldset>
-          <legend>Catgeorize</legend>
+          <legend>Assign category</legend>
           {categories.length > 0 && (
             <div className="row">
               <div className="input-group">
@@ -177,7 +202,10 @@ export const CategorizeTransaction = () => {
                     key={cat.id}
                     type="button"
                     className="primary"
-                    onClick={handleNewCategory}
+                    disabled={mutation.isLoading}
+                    onClick={(ev: MouseEvent<HTMLButtonElement>) => {
+                      handleCategoryClick(cat)
+                    }}
                   >
                     {cat.label}
                   </button>
@@ -190,14 +218,17 @@ export const CategorizeTransaction = () => {
               <label htmlFor="category">New category name</label>
               <input
                 type="text"
-                id="category"
-                value={newCategory}
+                id="categoryLabel"
+                value={newCategoryLabel}
                 autoComplete="off"
-                onChange={handleNewCategoryChange}
+                onChange={(ev: ChangeEvent<HTMLInputElement>) => {
+                  setNewCategoryLabel(ev.target.value)
+                }}
               />
               <button
                 type="button"
                 className="primary"
+                disabled={mutation.isLoading}
                 onClick={handleNewCategory}
               >
                 Categorize
