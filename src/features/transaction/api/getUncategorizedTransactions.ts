@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { axios } from '../../../lib/axios'
 import { Transaction, DbTransaction } from '../types/transaction'
 import { Category } from '../../../types/category'
-import { AxiosResponse } from 'axios'
 
 export interface Meta {
   isMore: boolean
@@ -40,7 +39,6 @@ export const getUncategorizedTransactions = (
   }
   // return axios.get<UncategorizedTransactionsDbResponse>(uri)
   return axios.get<UncategorizedTransactionsDbResponse>(uri).then((res) => {
-    console.log('res:', res)
     const { meta, transactions: dbTransactions, categories } = res.data
     const transactions: Array<Transaction> = dbTransactions
       .map(mapDbTxToTransaction)

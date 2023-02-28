@@ -38,6 +38,7 @@ export const CategorizeTransaction = () => {
   const [similarTxs, setSimilarTxs] = useState<Array<Transaction>>([])
   const [selectedTxIds, setSelectedTxIds] = useState<Array<string>>([])
   const [categories, setCategories] = useState<Array<Category>>([])
+  const [hasPrevious, setHasPrevious] = useState<boolean>(false)
   const [hasNext, setHasNext] = useState<boolean>(false)
   const [newCategoryLabel, setNewCategoryLabel] = useState<string>('')
   const mutation = useCategorizeTransaction()
@@ -50,6 +51,7 @@ export const CategorizeTransaction = () => {
   // })
 
   useEffect(() => {
+    console.log('useEffect: set up - #txs', data.transactions.length)
     const _txs = data?.transactions || []
     if (!txId) {
       return
@@ -62,14 +64,16 @@ export const CategorizeTransaction = () => {
     const _similarTxs = getSimilarTxs(_tx, _txs)
     const _selectedTxIds = _similarTxs.map((stx) => stx.id)
     const _categories = data?.categories || []
+    const _hasPrev = _txIndex > 0
     const _hasNext = _txIndex + 1 < _txs.length || data.meta.isMore
     setTx(_tx)
     setTxIndex(_txIndex)
     setSimilarTxs(_similarTxs)
     setSelectedTxIds(_selectedTxIds)
     setCategories(_categories)
+    setHasPrevious(_hasPrev)
     setHasNext(_hasNext)
-  }, ['txId'])
+  }, [])
 
   const handleTxToggle = (txId: string) => {
     const isSelected = selectedTxIds.includes(txId)
@@ -114,31 +118,41 @@ export const CategorizeTransaction = () => {
         setNewCategoryLabel('')
       }
 
-      // Find next transaction
-      const nextTxIndex = txIndex + 1
-      if (nextTxIndex < data.transactions.length) {
-        const nextTxs = data.transactions.slice(nextTxIndex)
-        const nextTx = nextTxs.find((t) => !selectedTxIds.includes(t.id))
-
-        // If we have another tx to categorize go to that page
-        if (nextTx) {
-          navigate(`/categorize/${nextTx.id}`)
-          return
-        }
-
-        // Are there any more uncategorized transactions? Fetch them.
-        if (data.meta.isMore) {
-          navigate('/categorize')
-          return
-        }
-
-        // Otherwise go to home page.
-        navigate('/')
-        return
-      }
+      navigateToNextTransaction(true)
     } catch (error) {
       console.error(error)
     }
+  }
+
+  const navigateToNextTransaction = (skipSelected: boolean) => {
+    const nextTxIndex = txIndex + 1
+    if (nextTxIndex < data.transactions.length) {
+      const nextTxs = data.transactions.slice(nextTxIndex)
+      const nextTx = skipSelected
+        ? nextTxs.find((t) => !selectedTxIds.includes(t.id))
+        : nextTxs[0]
+
+      // If we have another tx to categorize go to that page
+      if (nextTx) {
+        navigate(`/categorize/${nextTx.id}`)
+        return
+      }
+
+      // Are there any more uncategorized transactions? Fetch them.
+      if (data.meta.isMore) {
+        navigate('/categorize')
+        return
+      }
+
+      // Otherwise go to home page.
+      navigate('/')
+      return
+    }
+  }
+
+  const navigateToPreviousTransaction = () => {
+    const prevTx = data.transactions[txIndex - 1]
+    navigate(`/categorize/${prevTx.id}`)
   }
 
   if (!tx) {
@@ -213,6 +227,7 @@ export const CategorizeTransaction = () => {
               </div>
             </div>
           )}
+
           <div className="row">
             <div className="input-group">
               <label htmlFor="category">New category name</label>
@@ -236,6 +251,24 @@ export const CategorizeTransaction = () => {
             </div>
           </div>
         </fieldset>
+        <div className="row">
+          <button
+            disabled={!hasPrevious}
+            onClick={(ev: MouseEvent<HTMLButtonElement>) => {
+              navigateToPreviousTransaction()
+            }}
+          >
+            Previous
+          </button>
+          <button
+            disabled={!hasNext}
+            onClick={(ev: MouseEvent<HTMLButtonElement>) => {
+              navigateToNextTransaction(false)
+            }}
+          >
+            Next
+          </button>
+        </div>
       </form>
     </div>
   )

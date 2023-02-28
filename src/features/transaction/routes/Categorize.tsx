@@ -6,12 +6,13 @@ export const Categorize = () => {
   const { isLoading, isSuccess, isError, data, error } =
     useUncategorizedTransactions()
 
+  console.log('Categorize.render')
   return (
     <>
       <h1>Categorize</h1>
       {isLoading && <div className="spinner"></div>}
       {/* {isError && <p>Error: {error.message}</p>} */}
-      <Outlet context={data} />
+      {isSuccess && data && <Outlet context={data} />}
     </>
   )
 }
