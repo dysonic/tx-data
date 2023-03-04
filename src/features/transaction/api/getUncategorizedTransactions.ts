@@ -37,7 +37,7 @@ export const getUncategorizedTransactions = (
   if (includeCategories) {
     uri += '?include=categories'
   }
-  // return axios.get<UncategorizedTransactionsDbResponse>(uri)
+
   return axios.get<UncategorizedTransactionsDbResponse>(uri).then((res) => {
     const { meta, transactions: dbTransactions, categories } = res.data
     const transactions: Array<Transaction> = dbTransactions
@@ -51,15 +51,11 @@ export const getUncategorizedTransactions = (
   })
 }
 
-// type QueryFnType = typeof getUncategorizedTransactions
-
-// interface UseUncategorizedTransactionsOptions = {
-//   config?: QueryConfig<QueryFnType>;
-// };
-
 export const useUncategorizedTransactions = () => {
   return useQuery({
     queryKey: ['uncategorizedTransactions'],
     queryFn: () => getUncategorizedTransactions(true),
+    // staleTime: Infinity,
+    // cacheTime: Infinity,
   })
 }
