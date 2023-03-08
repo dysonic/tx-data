@@ -13,7 +13,7 @@ export const AutoSelectTx = () => {
   useEffect(() => {
     if (data?.transactions?.length) {
       const tx = data.transactions[0]
-      navigate(`/categorize/${tx.id}`)
+      navigate(tx.id, { replace: true })
     }
   }, [])
 

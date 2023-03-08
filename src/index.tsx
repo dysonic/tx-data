@@ -31,6 +31,7 @@ const router = createBrowserRouter(
         path="/categorize"
         element={<Categorize />}
         loader={async () => {
+          console.log('> loader')
           // const data = await getUncategorizedTransactions()
           await queryClient.prefetchQuery(['uncategorizedTransactions'], () =>
             getUncategorizedTransactions(true)

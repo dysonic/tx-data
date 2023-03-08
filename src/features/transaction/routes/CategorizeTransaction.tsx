@@ -8,8 +8,6 @@ import {
   useCategorizeTransaction,
   CategorizeTransactionPayload,
 } from '../api/categorizeTransaction'
-// import { categorizeTransaction } from '../api/categorizeTransaction'
-// import { useMutation } from '@tanstack/react-query'
 import { Meta } from '../api/getUncategorizedTransactions'
 // import "./Categorize.css";
 
@@ -51,7 +49,12 @@ export const CategorizeTransaction = () => {
   // })
 
   useEffect(() => {
-    console.log('useEffect: set up - #txs', data.transactions.length)
+    console.log(
+      'useEffect: set up - txId:',
+      txId,
+      '#txs',
+      data.transactions.length
+    )
     const _txs = data?.transactions || []
     if (!txId) {
       return
@@ -73,7 +76,7 @@ export const CategorizeTransaction = () => {
     setCategories(_categories)
     setHasPrevious(_hasPrev)
     setHasNext(_hasNext)
-  }, [])
+  }, [txId])
 
   const handleTxToggle = (txId: string) => {
     const isSelected = selectedTxIds.includes(txId)
@@ -134,6 +137,7 @@ export const CategorizeTransaction = () => {
 
       // If we have another tx to categorize go to that page
       if (nextTx) {
+        console.log('nextTx:', nextTx.id)
         navigate(`/categorize/${nextTx.id}`)
         return
       }
@@ -152,6 +156,7 @@ export const CategorizeTransaction = () => {
 
   const navigateToPreviousTransaction = () => {
     const prevTx = data.transactions[txIndex - 1]
+    console.log('prevTx:', prevTx.id)
     navigate(`/categorize/${prevTx.id}`)
   }
 
@@ -253,6 +258,7 @@ export const CategorizeTransaction = () => {
         </fieldset>
         <div className="row">
           <button
+            type="button"
             disabled={!hasPrevious}
             onClick={(ev: MouseEvent<HTMLButtonElement>) => {
               navigateToPreviousTransaction()
@@ -261,6 +267,7 @@ export const CategorizeTransaction = () => {
             Previous
           </button>
           <button
+            type="button"
             disabled={!hasNext}
             onClick={(ev: MouseEvent<HTMLButtonElement>) => {
               navigateToNextTransaction(false)
