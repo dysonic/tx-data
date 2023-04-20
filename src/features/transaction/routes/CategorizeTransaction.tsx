@@ -8,6 +8,10 @@ import {
   useCategorizeTransaction,
   CategorizeTransactionPayload,
 } from '../api/categorizeTransaction'
+import {
+  useToggleTransactionExclusion,
+  ToggleTransactionExclusionPayload,
+} from '../api/toggleTransactionExclusion'
 import { Meta } from '../api/getUncategorizedTransactions'
 // import "./Categorize.css";
 
@@ -76,7 +80,7 @@ export const CategorizeTransaction = () => {
     setCategories(_categories)
     setHasPrevious(_hasPrev)
     setHasNext(_hasNext)
-  }, [txId])
+  }, [txId, data])
 
   const handleTxToggle = (txId: string) => {
     const isSelected = selectedTxIds.includes(txId)
@@ -91,6 +95,10 @@ export const CategorizeTransaction = () => {
       return
     }
     setSelectedTxIds(selectedTxIds.concat(txId))
+  }
+
+  const handleExcludeCick = () => {
+    console.log('handleExcludeCick')
   }
 
   const handleCategoryClick = (category: Category) => {
@@ -173,33 +181,51 @@ export const CategorizeTransaction = () => {
       <form>
         <fieldset>
           <legend>Transaction: #{txIndex + 1}</legend>
-          <label htmlFor="date-posted">Date</label>
-          <input
-            type="text"
-            id="date-posted"
-            readOnly={true}
-            value={format(tx.datePosted, 'dd/MM/yyyy')}
-          />
-          <label htmlFor="type">Type</label>
-          <input type="text" id="type" readOnly={true} value={tx.type} />
-          <div className="input-group vertical">
-            <label htmlFor="description">Description</label>
+          <div className="input-group">
+            <label htmlFor="date-posted">Date</label>
             <input
               type="text"
-              id="description"
+              id="date-posted"
               readOnly={true}
-              value={tx.description}
+              value={format(tx.datePosted, 'dd/MM/yyyy')}
             />
-            <label htmlFor="notes">Notes</label>
-            <input type="text" id="notes" readOnly={true} value={tx.notes} />
+            <label htmlFor="type">Type</label>
+            <input type="text" id="type" readOnly={true} value={tx.type} />
+            <label htmlFor="amount">Amount $</label>
+            <input
+              type="text"
+              id="amount"
+              readOnly={true}
+              value={tx.amount.toFixed(2)}
+            />
           </div>
-          <label htmlFor="amount">Amount $</label>
-          <input
-            type="text"
-            id="amount"
-            readOnly={true}
-            value={tx.amount.toFixed(2)}
-          />
+          <div className="row">
+            <div className="col-md">
+              <label htmlFor="description">Description</label>
+              <input
+                type="text"
+                id="description"
+                readOnly={true}
+                value={tx.description}
+              />
+            </div>
+            <div className="col-md">
+              <label htmlFor="notes">Notes</label>
+              <input type="text" id="notes" readOnly={true} value={tx.notes} />
+            </div>
+          </div>
+          <div className="input-group vertical"></div>
+
+          <div className="row">
+            <button
+              type="button"
+              className="secondary"
+              disabled={mutation.isLoading}
+              onClick={handleExcludeCick}
+            >
+              Exlude
+            </button>
+          </div>
         </fieldset>
         {similarTxs.length > 0 && (
           <fieldset>
